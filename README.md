@@ -55,7 +55,7 @@ Using the Listing Class
 use Shopiro\Listing;
 
 // Create a listing
-$response = Listing::create('marketplace_low_volume', ['data']);
+$response = Listing::create('marketplace_low_volume', $listing);
 
 // Retrieve multiple listings
 $allListings = Listing::getAll(10, 0);
