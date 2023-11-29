@@ -36,7 +36,8 @@ $client = new ShopiroClient(123456, 'your_private_key');
 
 // Example: Create a request
 $response = $client->createRequest(
-    ['request_type' => 'get', 'request_scope' => '', 'request_action' => 'listing']
+    ['request_type' => 'get', 'request_scope' => '', 'request_action' => 'listing'],
+    ['slid'=>'SLID12345678901']
 );
 
 // Handle response
