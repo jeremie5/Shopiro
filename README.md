@@ -80,8 +80,8 @@ $listing = new Listing::create("marketplace_low_volume");
 // Or we can retrieve an existing listing as an object
 $listing=Listing::get('SLID12345678901');
 
-$listing->setTitle('en', 'Example Product');
-$listing->setDescription('en', 'This is a detailed description of the product.');
+$listing->setTitle('en-CA', 'Example Product');
+$listing->setDescription('en-CA', 'This is a detailed description of the product.');
 $listing->setShippingData(['weight' => 2, 'x_dimension' => 10, 'y_dimension' => 10]);
 
 // Save the changes to the existing listing or Shopiro will create a new one if it did not exist
