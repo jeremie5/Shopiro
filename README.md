@@ -1,8 +1,13 @@
-Shopiro PHP Client Library
-===============
+# Shopiro PHP Client Library
 
-##### The Shopiro PHP Client Library is a powerful and easy-to-use PHP client for interacting with the Shopiro API. 
-##### This library simplifies the process of making requests to the Shopiro platform, managing responses, and handling errors.
+## The Shopiro PHP Client Library is a powerful and easy-to-use PHP client for interacting with the Shopiro API. This comprehensive tool is designed to facilitate seamless integration with Shopiro, making it a go-to solution for developers looking to leverage the capabilities of Shopiro in their applications.
+
+#### This library simplifies the process of making requests to the Shopiro platform, managing responses, and handling errors. It provides an intuitive interface for developers, allowing them to focus on building features without worrying about the underlying complexities of network communication. By abstracting the details of HTTP requests and responses, the Shopiro Client Library enables faster and more reliable development workflows.
+
+Beyond basic request handling, the library offers advanced features like automatic network retries, request queuing, and the execution of chained API requests, ensuring robust and efficient interactions with the Shopiro API. Its design emphasizes ease of use and flexibility, accommodating a wide range of use cases from simple queries to complex transaction handling.
+The inclusion of specialized classes, such as the Listing class and various listing object types, further enriches the library's utility, providing tailored solutions for specific aspects of the Shopiro ecosystem. These classes streamline tasks such as listing creation, modification, and retrieval, offering a structured and scalable approach to managing data.
+With comprehensive documentation, clear usage examples, and adherence to modern coding standards, the Shopiro PHP Client Library is an indispensable tool for developers looking to harness the full potential of Shopiro.
+
 
 ## Requirements
 
@@ -43,13 +48,43 @@ if ($response['status'] === 'success') {
 ?>
 ```
 
-For more detailed listing manipulation, you can use listing objects like MarketplaceLowVolumeListingObject.
+Using the Listing Class
 ```php
 <?php
-$listing = new Shopiro\Listing::create("marketplace_low_volume");
+use Shopiro\Listing;
+
+// Create a listing
+$response = Listing::create('type', ['data']);
+
+// Retrieve multiple listings
+$allListings = Listing::getAll(10, 0);
+
+// Retrieve a single listing
+$singleListing = Listing::get('SLID12345678901');
+
+// Modify a listing
+$modifiedListing = Listing::modify(['slid' => 'SLID12345678901', 'new_data' => 'value']);
+
+// Delete a listing
+$deletedListing = Listing::delete('SLID12345678901');
+?>
+```
+
+For more detailed listing manipulation, you can use listing objects as such:
+```php
+<?php
+use Shopiro\Listing;
+// We can create() a new empty listing
+$listing = new Listing::create("marketplace_low_volume");
+
+// Or we can retrieve an existing listing as an object
+$listing=Listing::get('SLID12345678901');
+
 $listing->setTitle('en', 'Example Product');
 $listing->setDescription('en', 'This is a detailed description of the product.');
-$listing->setShippingData(['weight' => '1kg', 'x_dimension' => 10, 'y_dimension' => 10]);
+$listing->setShippingData(['weight' => 2, 'x_dimension' => 10, 'y_dimension' => 10]);
+
+// Save the changes to the existing listing or Shopiro will create a new one if it did not exist
 $createdListing=$listing->save();
 ?>
 ```
@@ -61,12 +96,13 @@ $createdListing=$listing->save();
 - Request queuing and execution
 - Chained API requests with a maximum chain length of 64
 - Detailed error handling and exceptions
+- Comprehensive listing management through the Listing class and listing objects
 
 ## API Reference
 The Shopiro API documentation can be found at Shopiro API Documentation.
 
 ## Contributing
-Contributions to the Shopiro PHP Client Library are welcome. Please ensure that your code adheres to the Shopiro PHP Coding Standards.
+Contributions to the Shopiro PHP Client Library are welcome. Please ensure that your code adheres to our existing coding standards.
 
 ## License
 This library is licensed under the MIT License - see the LICENSE file for details.
