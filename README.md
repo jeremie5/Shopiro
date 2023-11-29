@@ -32,7 +32,7 @@ require_once 'vendor/autoload.php';
 use Shopiro\ShopiroClient;
 
 // Initialize Shopiro client
-$client = new ShopiroClient(123456, 'your_private_key');
+$client = new ShopiroClient('your_application_id', 'your_private_key');
 
 // Example: Create a request
 $response = $client->createRequest(
