@@ -1,15 +1,21 @@
 <?php
 namespace Shopiro;
 
-class Order {
+class ListingCategory {
 	
-    public static function getAll(string $platformSegment, int $parentCategory, int $count, int $offset) {
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'listing_categories'], $payload=["ct" => $count, "of"=>$offset, "prt" => $parentCategory, "sgt"=>$platformSegment]);
+    private $shopiroClient;
+
+    public function __construct(ShopiroClient $shopiroClient) {
+        $this->shopiroClient = $shopiroClient;
+    }
+	
+    public function getAll(string $platformSegment, int $parentCategory, int $count, int $offset) {
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'listing_categories'], $payload=["ct" => $count, "of"=>$offset, "prt" => $parentCategory, "sgt"=>$platformSegment]);
 		return $response;
     }
 	
-	public static function get(int $categoryId){
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'listing_category'], $payload=["cty" => $categoryId]);
+	public function get(int $categoryId){
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'listing_category'], $payload=["cty" => $categoryId]);
 		return $response;
 	}
 	

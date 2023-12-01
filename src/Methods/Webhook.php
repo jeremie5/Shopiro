@@ -3,21 +3,24 @@ namespace Shopiro;
 
 class Webhook {
     
+    private $shopiroClient;
+
+    public function __construct(ShopiroClient $shopiroClient) {
+        $this->shopiroClient = $shopiroClient;
+    }
+	
     public static function get() {
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'webhook']);
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'webhook']);
 		return $response;
     }
 	
     public static function set(string $webhook_url) {
-		if(!is_array($listing)){
-			throw new \Exception('Bad listing representation');
-		}
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['set', 'webhook'], $payload=["lis" => $listing, "act"=>"set"]);
+        $response = $this->shopiroClient->createRequest($endpoint=['set', 'webhook'], $payload=["whk" => $webhook_url, "act"=>"set"]);
         return $response;
     }
 	
     public static function delete() {
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['set', 'webhook'], $payload=["act"=>"delete"]);
+        $response = $this->shopiroClient->createRequest($endpoint=['set', 'webhook'], $payload=["act"=>"delete"]);
         return $response;
     }
 	

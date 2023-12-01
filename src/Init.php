@@ -1,46 +1,49 @@
 <?php
 namespace Shopiro;
 
-require(__DIR__."/ShopiroClient.php");
-require(__DIR__."/HttpClient.php");
+if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+	require(__DIR__."/ShopiroClient.php");
+	require(__DIR__."/HttpClient.php");
 
-require(__DIR__."/Listing/Listing.php");
-require(__DIR__."/Listing/BaseListingObject.php");
-require(__DIR__."/Listing/ListingFactory.php");
-require(__DIR__."/Listing/GroceryListingObject.php");
-require(__DIR__."/Listing/JobListingObject.php");
-require(__DIR__."/Listing/MarketplaceFoodListingObject.php");
-require(__DIR__."/Listing/MarketplaceHighVolumeListingObject.php");
-require(__DIR__."/Listing/MarketplaceLowVolumeListingObject.php");
-require(__DIR__."/Listing/RealEstateRentalListingObject.php");
-require(__DIR__."/Listing/RealEstateSaleListingObject.php");
-require(__DIR__."/Listing/ServiceListingObject.php");
-require(__DIR__."/Listing/VehicleRentalListingObject.php");
-require(__DIR__."/Listing/VehicleSaleListingObject.php");
-require(__DIR__."/Listing/WholesaleListingObject.php");
-require(__DIR__."/ListingCategory.php");
-require(__DIR__."/ListingReview.php");
-require(__DIR__."/ListingSearch.php");
-require(__DIR__."/ListingPromotion.php");
+	require(__DIR__."/Methods/Listing/Listing.php");
+	require(__DIR__."/Methods/Listing/BaseListingObject.php");
+	require(__DIR__."/Methods/Listing/ListingFactory.php");
+	require(__DIR__."/Methods/Listing/GroceryListingObject.php");
+	require(__DIR__."/Methods/Listing/JobListingObject.php");
+	require(__DIR__."/Methods/Listing/MarketplaceFoodListingObject.php");
+	require(__DIR__."/Methods/Listing/MarketplaceHighVolumeListingObject.php");
+	require(__DIR__."/Methods/Listing/MarketplaceLowVolumeListingObject.php");
+	require(__DIR__."/Methods/Listing/RealEstateRentalListingObject.php");
+	require(__DIR__."/Methods/Listing/RealEstateSaleListingObject.php");
+	require(__DIR__."/Methods/Listing/ServiceListingObject.php");
+	require(__DIR__."/Methods/Listing/VehicleRentalListingObject.php");
+	require(__DIR__."/Methods/Listing/VehicleSaleListingObject.php");
+	require(__DIR__."/Methods/Listing/WholesaleListingObject.php");
+	require(__DIR__."/Methods/ListingCategory.php");
+	require(__DIR__."/Methods/ListingReview.php");
+	require(__DIR__."/Methods/ListingSearch.php");
+	require(__DIR__."/Methods/ListingPromotion.php");
 
-require(__DIR__."/User/PersonalBalance.php");
-require(__DIR__."/User/Affiliate.php");
+	require(__DIR__."/Methods/User/PersonalBalance.php");
+	require(__DIR__."/Methods/User/Affiliate.php");
 
-require(__DIR__."/Address/Address.php");
-require(__DIR__."/Address/Factory.php");
-require(__DIR__."/Address/Object.php");
-require(__DIR__."/Address/BaseAddressObject.php");
+	require(__DIR__."/Methods/Address/Address.php");
+	require(__DIR__."/Methods/Address/AddressFactory.php");
+	require(__DIR__."/Methods/Address/BaseAddressObject.php");
+	require(__DIR__."/Methods/Address/AddressObject.php");
 
-require(__DIR__."/Agent.php");
-require(__DIR__."/Conversation.php");
-require(__DIR__."/Dispute.php");
-require(__DIR__."/ExchangeRate.php");
-require(__DIR__."/Graphing.php");
-require(__DIR__."/HelpArticle.php");
-require(__DIR__."/Order.php");
-require(__DIR__."/SellerReview.php");
-require(__DIR__."/SellerReview.php");
-require(__DIR__."/ShippingMethod.php");
-require(__DIR__."/Transaction.php");
-require(__DIR__."/Warehouse.php");
-require(__DIR__."/Webhook.php");
+	require(__DIR__."/Methods/Store/Agent.php");
+	
+	require(__DIR__."/Methods/Conversation.php");
+	require(__DIR__."/Methods/Dispute.php");
+	require(__DIR__."/Methods/ExchangeRate.php");
+	require(__DIR__."/Methods/Graphing.php");
+	require(__DIR__."/Methods/HelpArticle.php");
+	require(__DIR__."/Methods/Order.php");
+	require(__DIR__."/Methods/SellerReview.php");
+	require(__DIR__."/Methods/SellerReview.php");
+	require(__DIR__."/Methods/ShippingMethod.php");
+	require(__DIR__."/Methods/Transaction.php");
+	require(__DIR__."/Methods/Warehouse.php");
+	require(__DIR__."/Methods/Webhook.php");
+}

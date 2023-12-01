@@ -8,9 +8,11 @@ class ShopiroClient{
 	
 	public $max_network_retries;
 	
-	private static $requestQueues = [];
+	private $requestQueues = [];
 	
 	private $httpClient;
+	
+	private $operationInstances = [];
 	
 	const MAX_CHAIN_LENGTH=64;
 	
@@ -26,13 +28,32 @@ class ShopiroClient{
 		$this->httpClient = new HttpClient();
     }
 	
-    public static function createRequest(array $endpoint, array $payload, string|null|bool $queue=null, callable|null $callback=null){
+    public function __get($name) {
+        if (!isset($this->operationInstances[$name])) {
+            $className = "Shopiro\\" . ucfirst($name);
+            $factoryClassName = "Shopiro\\" . ucfirst($name) . "Factory";
+            if (!class_exists($className)) {
+                throw new \Exception("Class $className does not exist.");
+            }
+            if (class_exists($factoryClassName)) {
+                $factoryInstance = new $factoryClassName();
+                $this->operationInstances[$name] = $factoryInstance->create($this);
+            }
+			else
+			{
+                $this->operationInstances[$name] = new $className($this);
+            }
+        }
+        return $this->operationInstances[$name];
+    }
+	
+    public function createRequest(array $endpoint, array $payload, string|null|bool $queue=null, callable|null $callback=null){
         if ($queue === null || $queue === false) {
             return $this->executeRequest($endpoint, $payload, $callback);
         }
 		else
 		{
-            self::$requestQueues[$queue][] = function() use ($endpoint, $payload, $callback) {
+            $this->requestQueues[$queue][] = function() use ($endpoint, $payload, $callback) {
                 return $this->executeRequest($endpoint, $payload, $callback);
             };
         }
@@ -49,12 +70,12 @@ class ShopiroClient{
         return null;
     }	
 	
-    public static function executeQueue(string $queueName){
-        if(!isset(self::$requestQueues[$queueName])){
+    public function executeQueue(string $queueName){
+        if(!isset($this->requestQueues[$queueName])){
             return false;
         }
         $results = [];
-        foreach(self::$requestQueues[$queueName] as $requestFunction){
+        foreach($this->requestQueues[$queueName] as $requestFunction){
             $results[] = $requestFunction();
         }
         return $results;

@@ -23,6 +23,10 @@ class AddressObject extends BaseAddressObject {
         $this->data['country'] = $value;
     }
 	
+    public function setSubdivision(string $value) {
+        $this->data['subdivision'] = $value;
+    }
+	
     public function setPostalCode(string $value) {
         $this->data['postal_code'] = $value;
     }

@@ -3,8 +3,14 @@ namespace Shopiro;
 
 class ExchangeRate {
     
-    public static function get() {
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'exchange_rates']);
+    private $shopiroClient;
+
+    public function __construct(ShopiroClient $shopiroClient) {
+        $this->shopiroClient = $shopiroClient;
+    }
+	
+    public function get() {
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'exchange_rates']);
 		return $response;
     }
 	

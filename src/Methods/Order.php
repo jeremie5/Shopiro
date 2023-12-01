@@ -3,13 +3,19 @@ namespace Shopiro;
 
 class Order {
 	
-    public static function getAll(int $count, int $offset) {
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'orders'], $payload=["ct" => $count, "of"=>$offset]);
+    private $shopiroClient;
+
+    public function __construct(ShopiroClient $shopiroClient) {
+        $this->shopiroClient = $shopiroClient;
+    }
+	
+    public function getAll(int $count, int $offset) {
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'orders'], $payload=["ct" => $count, "of"=>$offset]);
 		return $response;
     }
 	
-	public static function get(int $orderId){
-        $response = \Shopiro\ShopiroClient::createRequest($endpoint=['get', 'order'], $payload=["oid" => $orderId]);
+	public function get(int $orderId){
+        $response = $this->shopiroClient->createRequest($endpoint=['get', 'order'], $payload=["oid" => $orderId]);
 		return $response;
 	}
 
