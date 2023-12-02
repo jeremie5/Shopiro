@@ -14,11 +14,13 @@ class ShopiroClient{
 	
 	private $operationInstances = [];
 	
+	private $last_response_raw;
+	
 	const MAX_CHAIN_LENGTH=64;
 	
 	const API_BASE_URL="https://shopiro.ca/api/v1";
 
-    public function __construct(int $application_id, string $application_private_key){
+    public function __construct(int $application_id, #[\SensitiveParameter] string $application_private_key){
         if (version_compare(PHP_VERSION, '8.0.0', '<')) {
             throw new \Exception("ShopiroClient requires PHP version 8.0 or higher.");
         }
@@ -28,28 +30,26 @@ class ShopiroClient{
 		$this->httpClient = new HttpClient();
     }
 	
-    public function __get($name) {
-        if (!isset($this->operationInstances[$name])) {
-            $className = "Shopiro\\" . ucfirst($name);
-            $factoryClassName = "Shopiro\\" . ucfirst($name) . "Factory";
-            if (!class_exists($className)) {
-                throw new \Exception("Class $className does not exist.");
-            }
-            if (class_exists($factoryClassName)) {
-                $factoryInstance = new $factoryClassName();
-                $this->operationInstances[$name] = $factoryInstance->create($this);
-            }
-			else
-			{
-                $this->operationInstances[$name] = new $className($this);
-            }
-        }
-        return $this->operationInstances[$name];
-    }
+	public function __get($name) {
+		if (!isset($this->operationInstances[$name])) {
+			$className = "\\Shopiro\\" . ucfirst($name);
+			if (!class_exists($className)) {
+				throw new \Exception("Class $className does not exist.");
+			}
+			$reflector = new \ReflectionClass($className);
+			$constructor = $reflector->getConstructor();
+			if ($constructor && $constructor->getNumberOfRequiredParameters() > 1) {
+				throw new \Exception("Constructor for $className requires more than one argument.");
+			} else {
+				$this->operationInstances[$name] = new $className($this);
+			}
+		}
+		return $this->operationInstances[$name];
+	}
 	
     public function createRequest(array $endpoint, array $payload, string|null|bool $queue=null, callable|null $callback=null){
         if ($queue === null || $queue === false) {
-            return $this->executeRequest($endpoint, $payload, $callback);
+            return $this->executeRequest($endpoint, $payload, $callback)[0];
         }
 		else
 		{
@@ -59,16 +59,28 @@ class ShopiroClient{
         }
     }
 	
-    private static function processResponse(array $response) {
-        if (isset($response['success'])) {
+    public function getLastResponse(){
+        return $this->last_response_raw;
+    }
+	
+	private static function processResponse(string $requestId, array $response) {
+		if (isset($response['success']) && is_array($response['success'])) {
 			$response['success']['status']='success';
-            return $response['success'];
-        } elseif (isset($response['failed'])) {
-			$response['failed']['status']='failed';
-            return $response['failed'];
-        }
-        return null;
-    }	
+			return $response['success'];
+		} elseif (isset($response['failed'])) {
+			if (is_array($response['failed'])) {
+				$response['failed']['status']='failed';
+			}
+			return array_filter([
+				"status"=>"failed", 
+				"error_code"=>$response['failed'], 
+				"field_errors"=>$response['field_errors'],
+				"errors"=>$response['errors'],
+				"requestid"=>$requestId
+			]);
+		}
+		return null;
+	}
 	
     public function executeQueue(string $queueName){
         if(!isset($this->requestQueues[$queueName])){
@@ -85,14 +97,12 @@ class ShopiroClient{
 		if(empty($endpoint)){
 			throw new \Exception('Cannot send API request, no endpoint');
 		}
-		$request=[
+		$requests[]=[
 			"endpoint"=>$endpoint,
 			"payload"=>$payload,
-			"callback"=>function($response)use($endpoint, $payload, $callback){
-				return self::processResponse($response);
-			}
+			"callback"=>$callback
 		];
-		$this->executeRequests($request);
+		return $this->executeRequests($requests);
 	}
 
 	private function executeRequests(array $requests){
@@ -100,18 +110,20 @@ class ShopiroClient{
 			throw new \Exception('Cannot send more than '.self::MAX_CHAIN_LENGTH.' API requests at once');
 		}
 		foreach($requests as $request){
-			$chain[]=[
-				"request_type"=>$request["endpoint"]["request_type"],
-				"request_scope"=>$request["endpoint"]["request_scope"],
-				"request_action"=>$request["endpoint"]["request_action"],
+			if (!is_array($request)) {
+				throw new \Exception('Invalid request format. Expected an array.');
+			}
+			$chain[implode("/", $request["endpoint"])]=[
 				"post"=>$request["payload"]
 			];
 		}
+		$request['payload']['chain']=json_encode($chain);
         $results = [];
-		$url = self::API_BASE_URL.'/'.$this->application_id.'/chained';
-		$data = $request['payload'];
-		$headers = ['X-Custom-Pvk' => $this->application_private_key];
-		$response = $this->httpClient->sendRequest($url, 'POST', $data, $headers, $this->max_network_retries);
+		$url = self::API_BASE_URL.'/'.$this->application_id.'/'.$this->application_private_key.'/chained';
+		//$url = self::API_BASE_URL.'/'.$this->application_id.'/chained';
+		//$headers = ['X-Custom-Pvk' => $this->application_private_key];
+		$headers=[];
+		$response = $this->httpClient->sendRequest($url, 'POST', $request['payload'], $headers, $this->max_network_retries);
 		if($response === false){
 			throw new \Exception('CURL request failed after ' . $this->max_network_retries . ' attempts');
 		}
@@ -131,12 +143,13 @@ class ShopiroClient{
 				foreach($reqDetails as $reqId => $reqData){
 					if(isset($reqData['chain_key']) && isset($requests[$reqData['chain_key']])){
 						$chainKey = $reqData['chain_key'];
+						$this->last_response_raw=$reqData;
 						if(is_callable($callback = $requests[$chainKey]['callback'])){
-							$results[] = $callback($reqData);
+							$results[] = $callback(self::processResponse($reqId, $reqData));
 						}
 						else
 						{
-							$results[] = $reqData;
+							$results[] = self::processResponse($reqId, $reqData);
 						}
 					}
 				}

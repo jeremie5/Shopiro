@@ -1,7 +1,15 @@
 <?php
-namespace Shopiro;
+namespace Shopiro\Listing;
 
 class MarketplaceLowVolumeListingObject extends BaseListingObject {
+
+    public function toJSON() {
+        return json_encode((array)$this->data);
+    }
+
+    public function toArray() {
+        return (array)$this->data;
+    }
 
     public function setSubtype(string $value) {
         $this->data['subtype'] = $value;

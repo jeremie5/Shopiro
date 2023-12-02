@@ -4,15 +4,14 @@ namespace Shopiro;
 class Listing {
     
     private $shopiroClient;
-    private $listingFactory;
 
-    public function __construct(ShopiroClient $shopiroClient, ListingFactory $listingFactory) {
+    public function __construct(ShopiroClient $shopiroClient) {
         $this->shopiroClient = $shopiroClient;
-        $this->listingFactory = $listingFactory;
     }
 	
-    public function create(string $type, array $data) {
-		$listingObject = $this->listingFactory->create($type, $data);
+    public function create(string $type, ?array $data=[]) {
+		$data['type']=$type;
+		$listingObject = \Shopiro\Listing\ListingFactory::create($this, $data);
 		return $listingObject;
     }
 	
@@ -23,9 +22,9 @@ class Listing {
 	
 	public function get(string|array $slid){
 		if(is_array($slid)){
-			return self::getMany($slid);
+			return $this->getMany($slid);
 		}
-		return self::getSingle($slid);
+		return $this->getSingle($slid);
 	}
 	
     public function getSingle(string $slid) {
@@ -33,7 +32,7 @@ class Listing {
 			throw new \Exception('SLID failed validation');
 		}
         $response = $this->shopiroClient->createRequest($endpoint=['get', 'listing'], $payload=["slid" => $slid]);
-		return new BaseListingObject((array)$response);
+		return \Shopiro\Listing\ListingFactory::create($this, $response);
     }
 	
     public function getMany(array $slids) {
@@ -43,7 +42,7 @@ class Listing {
 				throw new \Exception('SLID failed validation');
 			}
             $this->shopiroClient->createRequest($endpoint=['get', 'listing'], $payload=["slid" => $slid], $queue='q', $callback=function($response) use (&$result, $slid) {
-                $result[$slid] = new BaseListingObject((array)$response);
+                $result[$slid] = \Shopiro\Listing\ListingFactory::create($this, $response);
             });
         }
         return $result;
@@ -51,16 +50,16 @@ class Listing {
 	
 	public function modify(array $listing){
 		if(is_array($listing)){
-			return self::modifyMany($listing);
+			return $this->modifyMany($listing);
 		}
-		return self::modifySingle($listing);
+		return $this->modifySingle($listing);
 	}
 	
     public function modifySingle(array $listing) {
 		if(!is_array($listing)){
 			throw new \Exception('Bad listing representation');
 		}
-        $response = $this->shopiroClient->createRequest($endpoint=['set', 'listing'], $payload=["lis" => $listing, "act"=>"modify"]);
+        $response = $this->shopiroClient->createRequest($endpoint=['set', 'edit_listing'], $payload=["lis" => json_encode($listing), "act"=>"modify"]);
         return $response;
     }
 	
@@ -70,7 +69,7 @@ class Listing {
 			if(!is_array($listing)){
 				throw new \Exception('Bad listing representation');
 			}
-            $this->shopiroClient->createRequest($endpoint=['set', 'listing'], $payload=["lis" => $listing, "act"=>"modify"], $queue='q', $callback=function($response) use (&$responses, $listing) {
+            $this->shopiroClient->createRequest($endpoint=['set', 'edit_listing'], $payload=["lis" => json_encode($listing), "act"=>"modify"], $queue='q', $callback=function($response) use (&$responses, $listing) {
                 $responses[$listing['slid']] = $response;
             });
         }
@@ -80,13 +79,13 @@ class Listing {
 	
 	public function delete(string|array $listing){
 		if(is_array($listing)){
-			return self::deleteMany($listing);
+			return $this->deleteMany($listing);
 		}
-		return self::deleteSingle($listing);
+		return $this->deleteSingle($listing);
 	}
 	
     public function deleteSingle(string $listing) {
-        $response = $this->shopiroClient->createRequest($endpoint=['set', 'listing'], $payload=["slid" => $listing, "act"=>"delete"]);
+        $response = $this->shopiroClient->createRequest($endpoint=['set', 'edit_listing'], $payload=["slid" => $listing, "act"=>"delete"]);
         return $response;
     }
 	

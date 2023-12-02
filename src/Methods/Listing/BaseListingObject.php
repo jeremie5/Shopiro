@@ -1,20 +1,23 @@
 <?php
-namespace Shopiro;
+namespace Shopiro\Listing;
 
 class BaseListingObject {
 	
-    private $data;
+    public $data;
+	
+    private $listingInstance;
 
-    public function __construct(array $data) {
+    public function __construct(array $data, object $listingInstance) {
         $this->data = $data;
+		$this->listingInstance=$listingInstance;
     }
 
     public function save() {
-		return \Shopiro\Listing::modifySingle($this->data);
+		return $this->listingInstance->modifySingle($this->data);
     }
 	
     public function delete() {
-		return \Shopiro\Listing::deleteSingle($this->data['slid']);
+		return $this->listingInstance->deleteSingle($this->data['slid']);
     }
 	
 }

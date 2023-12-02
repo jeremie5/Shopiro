@@ -3,32 +3,32 @@ namespace Shopiro\Listing;
 
 class ListingFactory {
 
-    public static function create(string $type, array $data) {
-        switch ($type) {
+    public static function create(object $listingInstance, array $data) {
+        switch ($data['type']) {
             case 'marketplace_low_volume':
-                return new MarketplaceLowVolumeListingObject($data);
+                return new \Shopiro\Listing\MarketplaceLowVolumeListingObject($data, $listingInstance);
             case 'marketplace_high_volume':
-				return new MarketplaceHighVolumeListingObject($data);
+				return new \Shopiro\Listing\MarketplaceHighVolumeListingObject($data, $listingInstance);
             case 'marketplace_food':
-				return new MarketplaceFoodListingObject($data);
+				return new \Shopiro\Listing\MarketplaceFoodListingObject($data, $listingInstance);
             case 'wholesale':
-				return new WholesaleListingObject($data);
+				return new \Shopiro\Listing\WholesaleListingObject($data, $listingInstance);
             case 'job':
-				return new JobListingObject($data);
+				return new \Shopiro\Listing\JobListingObject($data, $listingInstance);
             case 'vehicle_sale':
-				return new VehicleSaleListingObject($data);
+				return new \Shopiro\Listing\VehicleSaleListingObject($data, $listingInstance);
             case 'vehicle_rental':
-				return new VehicleRentalListingObject($data);
+				return new \Shopiro\Listing\VehicleRentalListingObject($data, $listingInstance);
             case 'realestate_sale':
-				return new RealEstateSaleListingObject($data);
+				return new \Shopiro\Listing\RealEstateSaleListingObject($data, $listingInstance);
             case 'realestate_rental':
-				return new RealEstateRentalListingObject($data);
+				return new \Shopiro\Listing\RealEstateRentalListingObject($data, $listingInstance);
             case 'realestate_rental':
-				return new RealEstateRentalListingObject($data);
+				return new \Shopiro\Listing\RealEstateRentalListingObject($data, $listingInstance);
             case 'grocery':
-				return new GroceryListingObject($data);
+				return new \Shopiro\Listing\GroceryListingObject($data, $listingInstance);
             default:
-                throw new \Exception("Unknown listing type $type");
+			throw new \Exception("Unknown listing type {$data['type']}");
         }
     }
 	
